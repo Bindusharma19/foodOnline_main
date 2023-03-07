@@ -89,9 +89,9 @@
                             <li class="has-border">
                                 <figure>
                                     {% if vendor.user_profile.profile_picture %}
-                                    <a href="#"><img src="{{vendor.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt="profile picture"></a>
+                                    <a href="{% url 'vendor_detail' vendor.vendor_slug %}"><img src="{{vendor.user_profile.profile_picture.url}}" class="attachment-full size-full wp-post-image" alt="profile picture"></a>
                                     {% else %}
-                                    <a href="#"><img src="{% static 'images/default-profile.png' %}" class="attachment-full size-full wp-post-image" alt="profile picture"></a>
+                                    <a href="{% url 'vendor_detail' vendor.vendor_slug %}"><img src="{% static 'images/default-profile.png' %}" class="attachment-full size-full wp-post-image" alt="profile picture"></a>
                                     {% endif %}
                                 </figure>
                             </li>
@@ -122,10 +122,10 @@
                                     <div class="img-holder">
                                         <figure><a href="#">
                                             {% if vendor.user_profile.profile_picture %}
-                                            <img src="{{vendor.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
-                                            {% else %}
-                                            <img src="{% static 'images/default-profile.png' %}" class="img-thumb wp-post-image" alt="">
-                                            {% endif %}
+                                            <a href="{% url 'vendor_detail' vendor.vendor_slug %}"><img src="{{vendor.user_profile.profile_picture.url}}" class="img-thumb wp-post-image" alt="">
+                                            {% else %}</a>
+                                            <a href="{% url 'vendor_detail' vendor.vendor_slug %}"><img src="{% static 'images/default-profile.png' %}" class="img-thumb wp-post-image" alt="">
+                                            {% endif %}</a>
                                         </a></figure>
                                         <span class="restaurant-status close">
                                             <em class="bookmarkRibbon"></em>Close
@@ -135,12 +135,17 @@
                                         
                                         <div class="post-title">
                                             <h5>
-                                                <a href="listing-detail.html">{{vendor.vendor_name}}</a>
+                                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}">{{vendor.vendor_name}}</a>
                                             </h5>
                                         </div>
                                         {% if vendor.user_profile.city and vendor.user_profile.state and vendor.user_profile.pin_code %}
                                         <span>{{vendor.user_profile.city}}, {{vendor.user_profile.state}}, {{vendor.user_profile.pin_code}}</span>
                                         
+                                        {% endif %}
+
+                                        {% if vendor.kms %}
+                                            <br>
+                                            <span><small><b>{{vendor.kms}} km</b> away</small></span>
                                         {% endif %}
                                     </div>
                                     
