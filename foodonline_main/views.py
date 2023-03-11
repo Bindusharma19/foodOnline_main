@@ -22,7 +22,7 @@ def get_or_set_current_location(request):
     
 def home(request):
     if get_or_set_current_location(request) is not None:
-
+        # restaurants nearby the user filter
         pnt = GEOSGeometry('POINT(%s %s)' % (get_or_set_current_location(request)))
 
         vendors = Vendor.objects.filter(user_profile__location__distance_lte=(pnt, D(km=1000))

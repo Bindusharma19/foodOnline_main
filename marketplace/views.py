@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
-from vendor.models import Vendor
+from vendor.models import Vendor, OpeningHour
 from menu.models import Category, FoodItem
 from django.db.models import Prefetch
 from .models import Cart
@@ -12,13 +12,15 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
 from django.contrib.gis.db.models.functions import Distance
 
+from datetime import date, datetime
+
 # Create your views here.
 
 def marketplace(request):
     vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
     vendor_count = vendors.count()
     vendor_count1 = Vendor.objects.count()
-    print(vendor_count, vendor_count1)
+    #print(vendor_count, vendor_count1)
     context = {
         'vendors' : vendors,
         'vendor_count' : vendor_count,
@@ -33,6 +35,16 @@ def vendor_detail(request, vendor_slug):
             queryset = FoodItem.objects.filter(is_available=True)
         )
     )
+
+    opening_hour = OpeningHour.objects.filter(vendor=vendor).order_by('day', '-from_hour')
+    #print(opening_hour)
+
+    # Check current day's opening hour
+    today_date = date.today()
+    today = today_date.isoweekday()
+    current_opening_hour = OpeningHour.objects.filter(vendor=vendor, day=today)
+    #print(today_date, today, current_opening_hour)
+    
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -41,6 +53,8 @@ def vendor_detail(request, vendor_slug):
         'vendor' : vendor,
         'categories' : categories,
         'cart_items' : cart_items,
+        'opening_hour' : opening_hour,
+        'current_opening_hour' : current_opening_hour,
     }
     return render(request, 'marketplace/vendor_detail.html', context)
 
@@ -75,7 +89,7 @@ def decrease_cart(request, food_id):
             # checks if food item exists
             try:
                 fooditem = FoodItem.objects.get(id=food_id)
-                print('Fooditem',fooditem)
+                #print('Fooditem',fooditem)
                 #Checks if the user has already added that food to the cart
                 try:
                     chkCart = Cart.objects.get(user=request.user, fooditem=fooditem)
@@ -84,7 +98,7 @@ def decrease_cart(request, food_id):
                         chkCart.save()
                     else:
                         chkCart.delete()
-                        print(chkCart,chkCart.quantity)
+                        #print(chkCart,chkCart.quantity)
                         chkCart.quantity = 0
                     return JsonResponse({'status':'Success', 'cart_counter':get_cart_counter(request), 'qty':chkCart.quantity, 'cart_amount':get_cart_amounts(request)})
                 except:
