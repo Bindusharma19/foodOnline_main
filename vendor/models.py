@@ -39,8 +39,6 @@ class Vendor(models.Model):
         return is_open
 
     
-
-    
     def save(self, *args, **kwargs):
         if self.pk is not None:
             # update
